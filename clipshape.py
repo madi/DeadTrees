@@ -96,12 +96,12 @@ def ObtainPixelsfromShape(field, rasterPath, shapePath, INX, *args):
     # imgarrayaux = img.ReadAsArray().shape
     # print "img.ReadAsArray().shape", img.ReadAsArray().shape
 
-
     #open shapefile
     driver = ogr.GetDriverByName("ESRI Shapefile")
     dataSource = driver.Open(shapePath, 0)
     layer = dataSource.GetLayer()
     clipdic = defaultdict(list)
+
     count = 0
 
     #Convert the layer extent to image pixel coordinates, we read only de pixels needed
