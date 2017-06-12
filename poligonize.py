@@ -1,22 +1,32 @@
-__author__ = "Laura Martinez Sanchez"
+__author__ = "Laura Martinez Sanchez, Margherita Di Leo"
 __license__ = "GPL"
-__version__ = "1.0"
-__email__ = "lmartisa@gmail.com"
+__version__ = "2.0"
+__email__ = "lmartisa@gmail.com, dileomargherita@gmail.com"
 
 
 from osgeo import gdal, ogr,osr
 import numpy as np
-#import mlh
 import time
-#from movingwindow import *
 from osgeo import gdal, gdalnumeric, ogr, osr,gdal_array
 import os
 import sys
+import argparse
 
 
-rasterpath = "/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/results_texture/"
-shapepath = "/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/results_texture/shape/"
+parser = argparse.ArgumentParser(description = "Performs prediction")
+parser.add_argument('--rasterpath', dest = "rasterpath",
+                                 help = "Input Path for the classified images")
+parser.add_argument('--shapepath', dest = "shapepath",
+                                 help = "Output Path for the classified polygons")
+parser.add_argument('--product', dest = "product",
+                                 help = "1 for dead trees (spiders), 6 for declining trees")
 
+
+args = parser.parse_args()
+
+rasterpath   = args.rasterpath
+shapepath = args.shapepath
+product = args.product
 
 
 def GetRasterDataSource (name, rasterpath):
@@ -44,10 +54,16 @@ def GetRasterDataSource (name, rasterpath):
 
 
 def polygonize(shapepath, file, rasterpath):
-    srcarray,projection,geotrans, shape = GetRasterDataSource(file, rasterpath)
+    srcarray, projection, geotrans, shape = GetRasterDataSource(file, rasterpath)
     print "Start polygonizing.."
     start = time.time()
-    srcarray[srcarray > 1] = 0 #we are interested in the class 1, we put everything else to 0
+    if product == '1':
+        srcarray[srcarray > 1] = 0 #we are interested in the class 1, we put everything else to 0
+    elif product == '6':
+        srcarray[srcarray < 6] = 0
+    else:
+        print "Product not available"
+
     drv = gdal.GetDriverByName('MEM')
     srs = osr.SpatialReference()
     srs.ImportFromWkt(projection)
@@ -55,13 +71,12 @@ def polygonize(shapepath, file, rasterpath):
     src_ds.SetGeoTransform(geotrans)
 
     src_ds.SetProjection(projection)
-    # gdal_array.BandWriteArray(src_ds.GetRasterBand(1), srcarray.T)
     gdal_array.BandWriteArray(src_ds.GetRasterBand(1), srcarray)
 
     srcband = src_ds.GetRasterBand(1)
 
     drv = ogr.GetDriverByName("ESRI Shapefile")
-    dst_ds = drv.CreateDataSource(shapepath + file + ".shp")
+    dst_ds = drv.CreateDataSource(shapepath + file + "_class" + product + ".shp")
 
     dst_layer = dst_ds.CreateLayer(shapepath + file, srs = srs)
     new_field = ogr.FieldDefn("type", ogr.OFTInteger)
@@ -90,7 +105,7 @@ def polygonize(shapepath, file, rasterpath):
 
 
     dst_layer.SyncToDisk()
-    dst_ds.ExecuteSQL("REPACK " + file)
+    dst_ds.ExecuteSQL("REPACK " + file + "_class" + product)
 
     print "Number of features after deleting: ", dst_layer.GetFeatureCount()
     dst_ds = None
