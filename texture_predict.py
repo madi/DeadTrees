@@ -9,22 +9,36 @@ from mlh import *
 from serialize import *
 from movingwindow import *
 import os
-
+import sys
+import argparse
 import re
 
-# orthoPath is the path to all ortophotos
-# resultPath is the folder where you want to find the results
-# texturePath is the path where the texture layers are
-orthoPath  = "/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/ortho/"
-texturepath = "/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/texture/"
-resultPath = "/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/results_texture/"
+parser = argparse.ArgumentParser(description = "Performs prediction")
+parser.add_argument('--orthoPath', dest = "orthoPath",
+                                 help = "Input Path for the original tile to process")
+parser.add_argument('--texturePath', dest = "texturePath",
+                                 help = "Input Path for the textures")
+parser.add_argument('--resultPath', dest = "resultPath",
+                                 help = "Output Path")
+
+
+args = parser.parse_args()
+
+orthoPath   = args.orthoPath
+texturePath = args.texturePath
+resultPath  = args.resultPath
+
+
+
+
+pickleModelFolder = "pickle/model/"
 
 
 feat = defaultdict(list)
-todo = []
+
 count = 0
-picklemodel = "modelKNN"
-model = read("pickle/model/" + str(picklemodel))
+picklemodel = "modelKNN-20161222_5classes"
+model = read( pickleModelFolder + str(picklemodel))
 
 
 Classifier = ImageClassifier(modeltype = 2, \
@@ -34,24 +48,18 @@ Classifier = ImageClassifier(modeltype = 2, \
 
 for file in os.listdir(orthoPath):
     if file.endswith(".tif"):
-        file = os.path.splitext(file)[0]
+        InputFile = file
 
+        file1 = os.path.join(orthoPath, InputFile)
+        file = os.path.splitext(InputFile)[0]
+        basename = file.split('-')[0] + "_" + file.split('-')[1]
 
-        Classifier.ImageToClassify(orthoPath + str(file) + ".tif", True, texturepath)
-        # True because added texture layers
+        Classifier.ImageToClassify(file1, True, texturePath, basename)
 
         Classifier.Classify()
-        Classifier.SaveImg(resultPath + str(file) + "_classified")
-
-        # break # uncomment here if you want to see the result on 1 tile
+        Classifier.SaveImg(resultPath + os.sep + str(basename) + "_classified")
 
         imgResult = moviw(Classifier.GetClassified(), \
-                          resultPath + str(file) + "_smooth", \
-                          Classifier.GetProjection(), \
-                          Classifier.GetGeotrans())
-
-        print "imgResult", imgResult
-
-        # count += 1
-        # if count > 4:
-        #     break
+                        resultPath + os.sep + str(basename) + "_smooth", \
+                        Classifier.GetProjection(), \
+                        Classifier.GetGeotrans())
