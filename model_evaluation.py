@@ -14,7 +14,7 @@ from serialize import *
 from graficas import *
 
 
-pickleclip  = "clipfeat-5new-text_calib"
+pickleclip  = "clipfeat-20161222_5classes"
 nLayers = 6 #number of layers
 
 
@@ -32,9 +32,9 @@ def Metrics(arrTrue, arrPredict, labels):
 def CrossValidation(X, y, model, labels):
     scores = np.empty(shape = (1, 3))
     averages = np.empty(shape = (1, 3))
-    kf = KFold(len(y), n_folds = 3)
+    kf = KFold(len(y), n_folds = 100)
     # KFold splits dataset into k consecutive folds (without shuffling by default)
-    skf = StratifiedKFold(y, 10)
+    skf = StratifiedKFold(y, 100)
     # StratifiedKFold is a variation of KFold that returns stratified folds.
     # The folds are made by preserving the percentage of samples for each class.
     rs = cross_validation.ShuffleSplit(len(y), \
@@ -47,7 +47,7 @@ def CrossValidation(X, y, model, labels):
     # guarantee that all folds will be different, although this is still very
     # likely for sizeable datasets.
 
-    for train, test in skf:
+    for train, test in kf:
         inx = 0
         # X_test, y_test are the test set
         X_train, X_test = X[train], X[test]
@@ -56,13 +56,15 @@ def CrossValidation(X, y, model, labels):
         y_pred = predicted.predict(X_test)
         Metrics(y_test, y_pred, labels)
         score = predicted.score(X_test, y_test)
+
         predicted = cross_validation.cross_val_predict(model, X_train, y_train)
         metricModel = metrics.accuracy_score(y_train, predicted)
         # print "train : ", train
         # print "test : ", test
         # print "Model : ", model
         # print "Labels : ", labels
-        # print "Score : ", score
+        print "Score : ", score
+        print "X_test, y_test ", X_test, y_test
         # print "Metric Model : ", metricModel
         scores[inx] = score
         averages[inx] = metricModel
