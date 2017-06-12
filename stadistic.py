@@ -15,7 +15,7 @@ import numpy as np
 feat = defaultdict(list)
 
 
-with open('pickle/clip/clipfeat-5-text_1.pickle', 'rb') as handle:
+with open('pickle/clip/clipfeat-2016-4c.pickle', 'rb') as handle:
 	Mylist = pickle.load(handle)
 
 feat = Mylist[0]
@@ -27,11 +27,11 @@ temp = defaultdict(list).fromkeys(feat)
 
 for key, value in feat.iteritems():
 	temp[str(key)] = np.concatenate(value)
-	print "---------" + str(key) + "----------"
+	print "---------Class " + str(key) + "----------"
 	deviation = np.std(temp[str(key)], axis = 0)
 	mean = np.mean(temp[str(key)], axis = 0)
-	print deviation
-	print mean
+	print "dev", deviation
+	print "mean", mean
 #----------------------------------------------------------------------
 # Use this to calculate the numbers to put in graph in presentation 2 page 18
 #### para el metodo
