@@ -19,15 +19,12 @@ def ListTextureLayers(texturepath, file):
     layers present in the folder, and lists the ones that match with the file name
     '''
     texturelist = []
-
-
-
-
     # DONE: added a check for texture name matching the file root name
     for texture in os.listdir(str(texturepath)):
         match = re.search(file, texture)
         if match:
             texturelist.append(texture)
+    texturelist.sort()
     return texturelist
 
 
