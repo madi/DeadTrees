@@ -9,6 +9,7 @@ from __future__ import print_function
 import os,sys
 import glob
 import argparse
+import grass.script as grass
 
 #---function: parse input
 def parseinput(name):
@@ -27,7 +28,7 @@ def rimport(INPUT_FOLDER, raster):
     os.system(cmd)
 
     # set working region
-    cmd = 'g.region rast=' + parsed +'.4 -a'
+    cmd = 'g.region rast=' + parsed + '.4 -a'
     os.system(cmd)
 
     return parsed
@@ -56,12 +57,17 @@ def calculateTextures(ortho, DESTINATION_FOLDER):
     os.system(cmd)
     cmd = 'r.texture -a input=' + ortho + '.4 output=text_b4_' + ortho +' size=7 distance=5'
     os.system(cmd)
-    cmd = 'i.group group=text_' + ortho + ' input=`g.list type=raster pattern=*text* mapset=. sep=,`'
-    os.system(cmd)
-    cmd = 'i.pca input=text_' + ortho + ' output=pca_text_' + ortho
-    os.system(cmd)
-    rexport('pca_text_' + ortho + '.1', DESTINATION_FOLDER)
-    rexport('pca_text_' + ortho + '.2', DESTINATION_FOLDER)
+    #cmd = 'i.group group=text_' + ortho + ' input=`g.list type=raster pattern=*text* mapset=. sep=,`'
+    #os.system(cmd)
+    #cmd = 'i.pca input=text_' + ortho + ' output=pca_text_' + ortho
+    #os.system(cmd)
+    #rexport('pca_text_' + ortho + '.1', DESTINATION_FOLDER)
+    #rexport('pca_text_' + ortho + '.2', DESTINATION_FOLDER)
+
+    textures = grass.read_command('g.list', type='raster', pattern='*text*', mapset='.', sep=',')
+    lista = textures.split(',')
+    for texture in lista:
+        rexport(texture, DESTINATION_FOLDER)
 
 
 
@@ -113,7 +119,7 @@ if __name__ == '__main__':
         ortho = rimport(INPUT_FOLDER, tile)
         calculateTextures(ortho, DESTINATION_FOLDER)
         # cleanup all
-        cmd = 'g.remove -f type=rast pattern=*' + ortho + '*'
-        os.system(cmd)
+        #cmd = 'g.remove -f type=rast pattern=*' + ortho + '*'
+        #os.system(cmd)
 
     print("Done the job!")
