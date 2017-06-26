@@ -65,6 +65,7 @@ def calculateTextures(ortho, DESTINATION_FOLDER):
     #rexport('pca_text_' + ortho + '.2', DESTINATION_FOLDER)
 
     textures = grass.read_command('g.list', type='raster', pattern='*text*', mapset='.', sep=',')
+    textures = textures.split('\n')[0]
     lista = textures.split(',')
     for texture in lista:
         rexport(texture, DESTINATION_FOLDER)
