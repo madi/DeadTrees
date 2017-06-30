@@ -11,12 +11,12 @@ from serialize import *
 #from multiprocessing import Pool
 
 # the pickle of the model is different from the clipshape
-picklemodel = "modelKNN" # name
+picklemodel = "modelKNN-20161222_5classes_2text" # name
 #picklemodel = "RadiusNeighborsC"
 
 # here you can put None to create a new pickle, or the name of an existing pickle
 # For example: the pickle created by initialize.py
-pickleclip  = "clipfeat-5-text_1"
+pickleclip  = "clipfeat-20161222_5classes_2text"
 layer = 6 # 4 bands + 2 texture layers
 
 #-------------------------------------------------------------------------------
