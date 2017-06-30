@@ -21,26 +21,17 @@ parser.add_argument('--texturePath', dest = "texturePath",
 parser.add_argument('--resultPath', dest = "resultPath",
                                  help = "Output Path")
 
-
 args = parser.parse_args()
 
 orthoPath   = args.orthoPath
 texturePath = args.texturePath
 resultPath  = args.resultPath
 
-
-
-
 pickleModelFolder = "pickle/model/"
+picklemodel = "modelKNN-20161222_5classes_2text"
+model = read(pickleModelFolder + str(picklemodel))
 
-
-feat = defaultdict(list)
-
-count = 0
-picklemodel = "modelKNN-20161222_5classes"
-model = read( pickleModelFolder + str(picklemodel))
-
-
+#feat = defaultdict(list)
 Classifier = ImageClassifier(modeltype = 2, \
                              Threads = 4, \
                              picklemodel = picklemodel, \
