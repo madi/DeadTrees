@@ -12,15 +12,16 @@ import os
 field = "zona" # field in the shapefile where to read the classes
 # The following is a subset of the ortophoto, in one file, to which the classes
 # are referred
-rasterPath  = "/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/Mosaic/Mosaic.tif"
+rasterPath  = "/home/madi/Projects/CasteloBranco/classification_test/trainingset/ortho/trainingset.tif"
 # The following is a shapefile with polygons representing the various classes
-shapePath   = "/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/Features/mosaic5.shp"
+shapePath   = "/home/madi/Projects/CasteloBranco/classification_test/trainingset/features/new_trainingset_features_20161222_5classes.shp"
 # Path to the texture layers of the training set
-texture_train_Path = "/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/texture_sample/"
-INX = False
-pickleclip = "clipfeat-5-text_1"
+texture_train_Path = "/home/madi/Projects/CasteloBranco/classification_test/trainingset/texture/"
+INX = True
+#pickleclip = "clipfeat-20161222_5classes"
+pickleclip = "clipfeat-20161222_5classes_2text"
 
-def init_texture(field, rasterPath, shapePath, INX, texture_train_Path, pickleclip):
+def init_texture(field, rasterPath, shapePath, INX, file, texture_train_Path, pickleclip):
     '''
     Create the initialization file (clip)
     '''
@@ -29,6 +30,7 @@ def init_texture(field, rasterPath, shapePath, INX, texture_train_Path, picklecl
                                           rasterPath, \
                                           shapePath, \
                                           INX,\
+                                          file, \
                                           texture_train_Path)
     # INX can be false. If True, uses additional layers.
     Mylist = [feat, nPixels] #pickle wants a list as input
@@ -38,4 +40,4 @@ def init_texture(field, rasterPath, shapePath, INX, texture_train_Path, picklecl
         os.makedirs("pickle/clip/")
     save("pickle/clip/" + pickleclip, Mylist)
 
-init_texture(field, rasterPath, shapePath, INX, texture_train_Path, pickleclip)
+init_texture(field, rasterPath, shapePath, INX, "trainingset", texture_train_Path, pickleclip)
