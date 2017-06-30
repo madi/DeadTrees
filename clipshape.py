@@ -71,7 +71,7 @@ def ReadClipArray(lrY, ulY, lrX, ulX, img):
 
 
 #Does the clip of the shape
-def ObtainPixelsfromShape(field, rasterPath, shapePath, INX, *args):
+def ObtainPixelsfromShape(field, rasterPath, shapePath, INX, file, *args):
 
     # field='zona'
     # open dataset, also load as a gdal image to get geotransform
@@ -82,7 +82,8 @@ def ObtainPixelsfromShape(field, rasterPath, shapePath, INX, *args):
     if args:
         texture_train_Path = args[0]
         print texture_train_Path
-        img, textArrayShp = createTextureArray(texture_train_Path, rasterPath)
+        img, textArrayShp = createTextureArray(texture_train_Path, rasterPath, file)
+        print file
 
     else:
         #print"Indexes = False"
@@ -117,11 +118,7 @@ def ObtainPixelsfromShape(field, rasterPath, shapePath, INX, *args):
         pxWidth  = int(lrX - ulX)
         pxHeight = int(lrY - ulY)
 
-
-
         clip = ReadClipArray(lrY, ulY, lrX, ulX, img)
-
-
 
         #EDIT: create pixel offset to pass to new image Projection info
         xoffset =  ulX
