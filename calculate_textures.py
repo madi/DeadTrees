@@ -9,7 +9,7 @@ from __future__ import print_function
 import os,sys
 import glob
 import argparse
-import grass.script as grass
+
 
 #---function: parse input
 def parseinput(name):
@@ -53,9 +53,11 @@ def rcleanup(raster):
 def calculateTextures(ortho, DESTINATION_FOLDER):
     '''Calculates texures and PCA
     '''
-    cmd = 'r.texture -a input=' + ortho + '.1 output=text_b1_' + ortho +' size=7 distance=5'
+    #cmd = 'r.texture -a input=' + ortho + '.1 output=text_b1_' + ortho +' size=7 distance=5'
+    cmd = 'r.texture input=' + ortho + '.1 output=text_b1_' + ortho + ' size=7 distance=5 method=var'
     os.system(cmd)
-    cmd = 'r.texture -a input=' + ortho + '.4 output=text_b4_' + ortho +' size=7 distance=5'
+    #cmd = 'r.texture -a input=' + ortho + '.4 output=text_b4_' + ortho +' size=7 distance=5'
+    cmd = 'r.texture input=' + ortho + '.4 output=text_b4_' + ortho + ' size=7 distance=5 method=sa'
     os.system(cmd)
     #cmd = 'i.group group=text_' + ortho + ' input=`g.list type=raster pattern=*text* mapset=. sep=,`'
     #os.system(cmd)
