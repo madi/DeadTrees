@@ -12,8 +12,8 @@ import os
 import sys
 import argparse
 
+parser = argparse.ArgumentParser(description = "Poligonize")
 
-parser = argparse.ArgumentParser(description = "Performs prediction")
 parser.add_argument('--rasterpath', dest = "rasterpath",
                                  help = "Input Path for the classified images")
 parser.add_argument('--shapepath', dest = "shapepath",
@@ -119,6 +119,8 @@ def polygonize(shapepath, file, rasterpath):
 
 
 def main(rasterpath, shapepath):
+    #TODO: sort list given by os.listdir and add a check to process only the
+    #files that haven't be processed yet (reading shapepath)
     for file in os.listdir(rasterpath):
         if file.endswith("_smooth.tif"):
             file = os.path.splitext(file)[0]
