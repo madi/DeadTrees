@@ -5,13 +5,17 @@ __email__ = "lmartisa@gmail.com, dileomargherita@gmail.com"
 
 
 
-from clipshape import *
+from clipshape2 import *
+from serialize import *
 import itertools
-from mlh import *
+#from mlh import *
 from collections import defaultdict
 import numpy as np
-from texture_initialize import *
+#from texture_initialize import *
 import matplotlib.pyplot as plt
+import os,sys
+import glob
+import argparse
 
 '''
 This code is used to establish the variability expressed by each texture layer
@@ -20,88 +24,133 @@ in each class
 
 
 feat = defaultdict(list)
-field = 'zona' # field in the shapefile where to read the classes
-# The following is a shapefile with polygons representing the various classes
-shapePath = '/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/Features/mosaic5.shp'
-textpath= '/home/v-user/shared/Documents/Documents/CANHEMON/classification_tests/texture_training/'
 
-INX = False # Classification based on only 4 bands
+#----------------------------------------------------------------------
 
+def initialize(FIELD, INPUT_FOLDER, SHAPEPATH, TEXTURE, pickleclip):
+    '''
+    Create the initialization file (clip)
+    '''
 
+    INX = False
+    rasterPath = INPUT_FOLDER + TEXTURE + ".tif"
+
+    feat, nPixels = ObtainPixelsfromShape(FIELD, \
+                                          rasterPath, \
+                                          SHAPEPATH, \
+                                          INX)
+
+    print feat.keys()
+    # INX can be false. If True, uses additional layers.
+    Mylist = [feat, nPixels] #pickle wants a list as input
+
+    # Creates the folder if it doesn't exist
+    if not os.path.exists("pickle/clip/"):
+        os.makedirs("pickle/clip/")
+    save(pickleclip, Mylist)
+    print "saved ", pickleclip
 
 
 #----------------------------------------------------------------------
 
-def myboxplot(title, data, median, deviation, categories):
+def myboxplot(title, data, median, deviation, categories, DESTINATION_FOLDER):
 
-    path = "/home/v-user/shared/Documents/Documents/CANHEMON/texture_stats/"
 
     fig = plt.figure()
 
     plt.boxplot(data, notch = True)
-    # plt.xticks([1, 2, 3, 4], categories)
-    plt.xticks([1, 2, 3, 4], ["Dead Tree", "Soil", "Healthy Tree", "Shadow"])
+
+    plt.xticks([1, 2, 3, 4, 6], ["Spiders", "Healthy Tree", "Soil", "Shadow", "Declining Tree"])
     plt.title(title)
 
-    fig.savefig(path + title + ".png")
+    print "Saving.. ", str(DESTINATION_FOLDER) + os.sep + str(title) + ".png"
+
+    fig.savefig(str(DESTINATION_FOLDER) + os.sep + str(title) + ".png")
 
     # plt.show()
-
 
 
 #----------------------------------------------------------------------
 
 if __name__ == "__main__":
 
-    for file in os.listdir(textpath):
-        if file.endswith(".tif"):
-            file = os.path.splitext(file)[0]
-            print file
-            # init_texture(field, textpath + str(file)+ ".tif", shapePath, INX, file)
+    ##---INPUT
+    # parser
+    parser = argparse.ArgumentParser(description = 'Calculates statistics of \
+             representativeness of each class in the given texture')
 
-            # file = "text_training_mosaic_b1_ASM"
+    # path to input folder
+    parser.add_argument('--textPath', dest = "textPath",
+    help = "Folder where the input textures are. ")
+    # example: '/home/madi/Projects/CasteloBranco/classification_test/trainingset/texture/'
 
-            with open('pickle/clip/' + str(file) + '.pickle', 'rb') as handle:
-            	Mylist = pickle.load(handle)
+    # path to shapefile folder
+    parser.add_argument('--shapePath', dest = "shapePath",
+    help = "Shapefile used as reference classification, path included. The shape \
+            file contains the polygons representing each class. ")
+    # example: '/home/madi/Projects/CasteloBranco/classification_test/trainingset/features/new_trainingset_features_20161222_5classes.shp'
 
-            feat = Mylist[0]
-            print "feat.keys()", feat.keys()
+    parser.add_argument('--field', dest = "field",
+    help = "field in the shapefile where to read the classes. ")
+    # example: 'zona'
 
-            temp = defaultdict(list).fromkeys(feat)
-            # print 'temp:', temp
-            categories = []
-            median = []
-            deviation = []
-            data = []
+    # path to output folder
+    parser.add_argument('--outfolder', dest = "outfolder",
+    help = "Destination folder where the graphics will be saved. ")
+    # example: '/home/madi/Projects/CasteloBranco/classification_test/trainingset/stats/'
 
-            for key, value in feat.iteritems():
+    parser.add_argument('--texture', dest = "texture",
+    help = "texture file to process. ")
+    # example: 'text_b1_trainingset_Contr'
 
-                texturefile = str(file)
-                temp[str(key)] = np.concatenate(value)
-                element = [texturefile, key, value, temp[str(key)]]
+    args = parser.parse_args()
 
-                print "Texture file: ", texturefile
-                print "Category: ", key
-                categories.append(key)
-                print "Median value: ", np.median(temp[str(key)])
-                median.append(np.median(temp[str(key)]))
-                print "Deviation: ", np.std(temp[str(key)])
-                a = np.std(temp[str(key)])
-                deviation.append((-a, a))
+    global INPUT_FOLDER
+    global DESTINATION_FOLDER
+    global TEXTURE
+    global SHAPEPATH
+    global FIELD
 
-                data.append(temp[str(key)])
+    INPUT_FOLDER = args.textPath
+    DESTINATION_FOLDER = args.outfolder
+    TEXTURE = args.texture
+    SHAPEPATH = args.shapePath
+    FIELD = args.field
+    pickleclip = 'pickle/clip/' + TEXTURE
 
+
+
+    print "Initializing.. ", pickleclip
+    initialize(FIELD, INPUT_FOLDER, SHAPEPATH, TEXTURE, pickleclip)
+
+    with open(pickleclip + '.pickle', 'rb') as handle:
+        Mylist = pickle.load(handle)
+
+        feat = Mylist[0]
+        print "feat.keys()", feat.keys()
+
+        temp = defaultdict(list).fromkeys(feat)
+        categories = []
+        median = []
+        deviation = []
+        data = []
+
+        for key, value in feat.iteritems():
+
+            texturefile = str(TEXTURE)
+            temp[str(key)] = np.concatenate(value)
+            element = [texturefile, key, value, temp[str(key)]]
+
+            print "Texture file: ", texturefile
+            print "Category: ", key
+            categories.append(key)
+            print "Median value: ", np.median(temp[str(key)])
+            median.append(np.median(temp[str(key)]))
+            print "Deviation: ", np.std(temp[str(key)])
+            a = np.std(temp[str(key)])
+            deviation.append((-a, a))
+
+            data.append(temp[str(key)])
 
             print deviation
-            myboxplot(file, data, median, deviation, categories)
-
-
-
-
-
-                # print "---------Texture used" + str(file) + "----------"
-                # print "---------Classification type " + str(key) + "----------"
-                # deviation = np.std(temp[str(key)] , axis = 0)
-                # mean = np.mean(temp[str(key)] , axis = 0)
-                # print "deviation", deviation
-                # print "mean", mean
+            myboxplot(texturefile, data, median, deviation, categories, DESTINATION_FOLDER)
