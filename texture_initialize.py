@@ -17,9 +17,9 @@ rasterPath  = "/home/madi/Projects/CasteloBranco/classification_test/trainingset
 shapePath   = "/home/madi/Projects/CasteloBranco/classification_test/trainingset/features/new_trainingset_features_20161222_5classes.shp"
 # Path to the texture layers of the training set
 texture_train_Path = "/home/madi/Projects/CasteloBranco/classification_test/trainingset/texture/"
-INX = True
+INX = True # INX can be false. If True, uses additional layers.
 #pickleclip = "clipfeat-20161222_5classes"
-pickleclip = "clipfeat-20161222_5classes_2text"
+pickleclip = "clipfeat-20161222_5classes_2text_new"
 
 def init_texture(field, rasterPath, shapePath, INX, file, texture_train_Path, pickleclip):
     '''
@@ -32,7 +32,7 @@ def init_texture(field, rasterPath, shapePath, INX, file, texture_train_Path, pi
                                           INX,\
                                           file, \
                                           texture_train_Path)
-    # INX can be false. If True, uses additional layers.
+
     Mylist = [feat, nPixels] #pickle wants a list as input
 
     # Creates the folder if it doesn't exist
@@ -40,4 +40,7 @@ def init_texture(field, rasterPath, shapePath, INX, file, texture_train_Path, pi
         os.makedirs("pickle/clip/")
     save("pickle/clip/" + pickleclip, Mylist)
 
-init_texture(field, rasterPath, shapePath, INX, "trainingset", texture_train_Path, pickleclip)
+#----------------------------------------------------------------------
+
+if __name__ == "__main__":
+    init_texture(field, rasterPath, shapePath, INX, "trainingset", texture_train_Path, pickleclip)
