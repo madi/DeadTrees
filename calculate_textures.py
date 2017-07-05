@@ -51,13 +51,11 @@ def rcleanup(raster):
 
 #---function: calculate textures and PCA
 def calculateTextures(ortho, DESTINATION_FOLDER):
-    '''Calculates texures and PCA
+    '''Calculates texures
     '''
-    #cmd = 'r.texture -a input=' + ortho + '.1 output=text_b1_' + ortho +' size=7 distance=5'
-    cmd = 'r.texture input=' + ortho + '.1 output=text_b1_' + ortho + ' size=7 distance=5 method=var'
+    cmd = 'r.texture -a input=' + ortho + '.1 output=text_b1_' + ortho +' size=7 distance=5'
     os.system(cmd)
-    #cmd = 'r.texture -a input=' + ortho + '.4 output=text_b4_' + ortho +' size=7 distance=5'
-    cmd = 'r.texture input=' + ortho + '.4 output=text_b4_' + ortho + ' size=7 distance=5 method=sa'
+    cmd = 'r.texture -a input=' + ortho + '.4 output=text_b4_' + ortho +' size=7 distance=5'
     os.system(cmd)
     #cmd = 'i.group group=text_' + ortho + ' input=`g.list type=raster pattern=*text* mapset=. sep=,`'
     #os.system(cmd)
@@ -79,8 +77,8 @@ if __name__ == '__main__':
 
     ##---INPUT
     # parser
-    parser = argparse.ArgumentParser(description = 'Calculate the PCA of the \
-                                     textures based on 4 bands orthophothos')
+    parser = argparse.ArgumentParser(description = 'Calculate the textures for \
+                                      band 1 and 4 of 4 bands orthophothos')
 
     # path to input folder
     parser.add_argument('--infolder', dest = "infolder",
@@ -88,7 +86,7 @@ if __name__ == '__main__':
 
     # path to output folder
     parser.add_argument('--outfolder', dest = "outfolder",
-    help = "Destination folder where the textures will be written.")
+    help = "Destination folder where the textures will be written. ")
 
     args = parser.parse_args()
 
